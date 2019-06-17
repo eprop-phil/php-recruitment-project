@@ -7,6 +7,8 @@
 
 declare(strict_types=1);
 
+namespace Tests;
+
 use PHPUnit\Framework\TestCase;
 use PropertyLogic\Chess\Chessboard;
 use PropertyLogic\Chess\King;

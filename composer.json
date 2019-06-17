@@ -1,6 +1,9 @@
 {
     "require": {
-        "phpunit/phpunit": "^8.2",
+        "php": "^7.2",
+        "phpunit/phpunit": "^8.2"
+    },
+    "require-dev": {
         "mockery/mockery": "^1.2"
     },
     "config": {
@@ -10,5 +13,8 @@
     },
     "autoload": {
         "psr-4": { "PropertyLogic\\Chess\\": "src/" }
+    },
+    "autoload-dev": {
+        "psr-4": { "Tests\\": "tests/" }
     }
 }
