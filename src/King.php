@@ -51,6 +51,9 @@ class King implements Piece
      * A king may move one square in any direction provided that it does not move into a
      * position where it may be captured (See https://en.wikipedia.org/wiki/Check_(chess)).
      *
+     * Note that the method isInCheck() is stubbed and you do not need to implement testing if the
+     * king is in check for this project.
+     *
      * A king may castle subject to certain conditions.  See https://en.wikipedia.org/wiki/Chess#Castling
      *
      * @param int $targetRank
