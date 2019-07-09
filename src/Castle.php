@@ -25,6 +25,17 @@ class Castle implements Piece
     private $colour;
 
     /**
+     * The turn number the rook last moved
+     * @var integer
+     */
+    private $lastMove = 0;
+    
+    /**
+     * @var MoveTypeEnum
+     */
+    private $moveType = MoveTypeEnum::NORMAL;
+
+    /**
      * @param int $targetRank
      * @param int $targetColumn
      * @throws InvalidMoveException
@@ -33,8 +44,7 @@ class Castle implements Piece
     {
         if ($this->isMoveLegal($targetRank, $targetColumn)) {
 
-            $this->rank = $targetRank;
-
+            $this->rank   = $targetRank;
             $this->column = $targetColumn;
 
         } else {
@@ -54,6 +64,8 @@ class Castle implements Piece
      */
     public function isMoveLegal(int $targetRank, int $targetColumn): bool
     {
+        $this->setMoveType(MoveTypeEnum::NORMAL);
+
         return true;
     }
 
@@ -64,9 +76,24 @@ class Castle implements Piece
      */
     public function hasMoved() : bool
     {
-        return false;
+        return ($this->getLastMove() > 0);
     }
 
+    /**
+     * @return int
+     */
+    public function getLastMove() : int
+    {
+        return $this->lastMove;
+    }
+
+    /**
+     * @return void
+     */
+    public function setLastMove(int $turn)
+    {
+        $this->lastMove = $turn;
+    }
 
     /**
      * @return ColourEnum
@@ -115,5 +142,21 @@ class Castle implements Piece
     public function setColumn(int $column)
     {
         $this->column = $column;
+    }
+
+    /**
+     * @//return MoveTypeEnum
+     */
+    public function getMoveType()
+    {
+        return $this->moveType;
+    }
+
+    /**
+     *  @//param MoveTypeEnum $moveType
+     */
+    public function setMoveType($moveType)
+    {
+        $this->moveType = $moveType;
     }
 }

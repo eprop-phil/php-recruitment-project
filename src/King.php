@@ -24,6 +24,16 @@ class King implements Piece
      */
     private $colour;
 
+    /**
+     * The turn number the king last moved
+     * @var integer
+     */
+    private $lastMove = 0;
+
+    /**
+     * @var MoveTypeEnum;
+     */
+    private $moveType = MoveTypeEnum::NORMAL;
 
     /**
      * @param int $targetRank
@@ -33,13 +43,10 @@ class King implements Piece
     public function move(int $targetRank, int $targetColumn): void
     {
         if ($this->isMoveLegal($targetRank, $targetColumn)) {
-
-            $this->rank = $targetRank;
-
+            $this->rank   = $targetRank;
             $this->column = $targetColumn;
 
         } else {
-
             throw new InvalidMoveException("That move is illegal");
 
         }
@@ -62,6 +69,22 @@ class King implements Piece
      */
     public function isMoveLegal(int $targetRank, int $targetColumn): bool
     {
+        $this->setMoveType(MoveTypeEnum::NORMAL);
+
+        if ($this->isSuitableCastlePresentForCastling($targetRank, $targetColumn)) {
+            $this->setMoveType(MoveTypeEnum::CASTLE);
+
+            return true;
+        }
+
+        if (abs($this->rank - $targetRank) > 1) {
+            return false;
+        }
+
+        if (abs($this->column - $targetColumn) > 1) {
+            return false;
+        }
+
         return true;
     }
 
@@ -92,7 +115,28 @@ class King implements Piece
      */
     public function isSuitableCastlePresentForCastling(int $targetRank, int $targetColumn): bool
     {
-        return true;
+        if ($this->hasMoved()) {
+            return false;
+        }
+        if ($this->isInCheck($targetRank, $targetColumn)) {
+            return false;
+        }
+        if ($targetRank == 1 && $this->getColour() == ColourEnum::BLACK) {
+            return false;
+        }
+        if ($targetRank == 8 && $this->getColour() == ColourEnum::WHITE) {
+            return false;
+        }
+
+        return in_array($targetColumn , [2, 7]);
+        // the king is not currently in check
+        // is target rank 1 for white or 8 for black
+        // is column 2 or 7
+        // if 2 has the rook on square HOME,1 moved
+        // if 7 has the rook on square HOME,8 moved
+        // are all the squares between king and rook empty
+        // are any of the squares between king and rook attacked by any opponent piece
+
     }
 
     /**
@@ -102,9 +146,23 @@ class King implements Piece
      */
     public function hasMoved() : bool
     {
-        return false;
+        return ($this->getLastMove() > 0);
     }
 
+    /**
+     * @return int
+     */
+    public function getLastMove() : int
+    {
+        return $this->lastMove;
+    }
+    /**
+     * @return void
+     */
+    public function setLastMove(int $turn)
+    {
+        $this->lastMove = $turn;
+    }
 
     /**
      * @return ColourEnum
@@ -149,10 +207,27 @@ class King implements Piece
 
     /**
      * @param int $column
+     * @return void
      */
     public function setColumn(int $column)
     {
         $this->column = $column;
+    }
+
+    /**
+     * @//return MoveTypeEnum
+     */
+    public function getMoveType() //: MoveTypeEnum
+    {
+        return $this->moveType;
+    }
+    
+    /**
+     *  @//param MoveTypeEnum $moveType
+     */
+    public function setMoveType($moveType)
+    {
+        $this->moveType = $moveType;
     }
 
 }

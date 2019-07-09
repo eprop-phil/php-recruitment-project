@@ -7,13 +7,24 @@
 
 declare(strict_types=1);
 
+error_reporting(E_ALL);
+
 use PHPUnit\Framework\TestCase;
 use PropertyLogic\Chess\Chessboard;
 use PropertyLogic\Chess\King;
+use PropertyLogic\Chess\Castle;
 use PropertyLogic\Chess\ColourEnum;
 
 final class KingTest extends TestCase
 {
+
+    public function testCannotMoveOntoSameSquare()
+    {
+        $this->expectException(\Exception::class);
+
+        $this->doMove(4,4 , 4,4);
+        
+    }
 
     /**
      * TODO:
@@ -26,14 +37,47 @@ final class KingTest extends TestCase
      */
     public function testCannotMoveMoreThanOneSquare()
     {
-        $this->expectException(\Exception::class);
+        try {
+            $this->doMove(4,4 , 4,6);
+
+        }
+        catch(Exception $e) {
+            $this->assertEquals($e->getMessage(), 'Could not move that piece');
+
+        }
+
+        try {
+            $this->doMove(4,6 , 1,1);
+
+        }
+        catch(Exception $e) {
+            $this->assertEquals($e->getMessage(), 'Could not move that piece');
+
+        }
+
+        try {
+            $this->doMove(1,1 , 6,3);
+
+        }
+        catch(Exception $e) {
+            $this->assertEquals($e->getMessage(), 'Could not move that piece');
+
+        }
+
+    }
+
+    /**
+     * 
+     * 
+     */
+    public function doMove(int $fromRank, int $fromColumn, int $toRank, int $toColumn)
+    {
         $king = new King();
         $king->setColour(new ColourEnum(ColourEnum::BLACK));
         $board = new Chessboard();
-        $board->addPiece($king, 4, 4);
-        $board->movePiece(4,4, 4, 6);
-        $board->movePiece(4,6, 1, 1);
-        $board->movePiece(1,1, 6, 3);
+        $board->addPiece($king, $fromRank, $fromColumn);
+
+        $board->movePiece($fromRank,$fromColumn, $toRank,$toColumn);
     }
 
     /**
@@ -49,10 +93,45 @@ final class KingTest extends TestCase
     {
         $king = new King();
         $king->setColour(new ColourEnum(ColourEnum::WHITE));
+
+        $rook = new Castle();
+        $rook->setColour(new ColourEnum(ColourEnum::WHITE));
+       
         $board = new Chessboard();
-        $board->addPiece($king, 1, 4);
-        $board->movePiece(1,4, 1, 2);
-        $this->assertTrue(true);
+        $board->addPiece($king, 1,4);
+        $board->addPiece($rook, 1,1);
+
+        $board->movePiece(1,4, 1,2);
+        //echo "\n###\n".print_r($board->getPieceOnSquare(1,1),true)."\n###\n";
+
+        $this->assertEquals(null,  $board->getPieceOnSquare(1,1));
+        $this->assertEquals($king, $board->getPieceOnSquare(1,2));
+        $this->assertEquals($rook, $board->getPieceOnSquare(1,3));
+        $this->assertEquals(null,  $board->getPieceOnSquare(1,4));
     }
 
+    public function testThat_King_NotAllowedToCastleIf_Rook_HasMoved()
+    {
+        $king = new King();
+        $king->setColour(new ColourEnum(ColourEnum::WHITE));
+
+        $rook = new Castle();
+        $rook->setColour(new ColourEnum(ColourEnum::WHITE));
+       
+        $board = new Chessboard();
+        $board->addPiece($king, 1,4);
+        $board->addPiece($rook, 1,2);
+
+        $board->movePiece(1,2, 1,1); // ensure rook move count increments from 0
+
+        try {
+            $this->doMove(1,4 , 1,2);
+
+        }
+        catch(Exception $e) {
+            $this->assertEquals($e->getMessage(), 'Could not move that piece');
+
+        }
+
+    }
 }
